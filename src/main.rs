@@ -118,7 +118,7 @@ if the file does not exist.\
                 .short("t")
                 .long("to")
                 .takes_value(true)
-                .possible_values(&["html", "commonmark"])
+                .possible_values(&["html", "xml", "commonmark"])
                 .default_value("html")
                 .value_name("FORMAT")
                 .help("Specify output format"),
@@ -170,6 +170,11 @@ if the file does not exist.\
                 .default_value("dash")
                 .value_name("LIST_STYLE")
                 .help("Specify bullet character for lists (-, +, *) in CommonMark ouput"),
+        )
+        .arg(
+            clap::Arg::with_name("sourcepos")
+            .long("sourcepos")
+            .help("Include source position attribute in XML output"),
         );
 
     let mut matches = app.clone().get_matches();
@@ -234,6 +239,7 @@ if the file does not exist.\
                 .unwrap_or("dash")
                 .parse::<ListStyleType>()
                 .expect("unknown list style"),
+            sourcepos: matches.is_present("sourcepos"),
         },
     };
 
@@ -287,6 +293,7 @@ if the file does not exist.\
             plugins.render.codefence_syntax_highlighter = syntax_highlighter;
             comrak::format_html_with_plugins
         }
+        Some("xml") => comrak::format_xml_with_plugins,
         Some("commonmark") => comrak::format_commonmark_with_plugins,
         _ => panic!("unknown format"),
     };
